@@ -219,7 +219,3 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Cache vs Fresh**: Cloudinary caches generated transformations at edge points. The benchmarking suite appends unique cache-busting timestamps to test both cold and warm edge response times.
 
 ---
-
-## 🤝 Cloudinary Creators Community Milestone
-
-Built as a verified milestone project for the **Cloudinary Creators Community** to provide a hands-on developer sandbox demonstrating dynamic transformations, secure signature generation, and payload benchmarking.
