@@ -7,6 +7,76 @@ It allows engineers to construct transformation parameters visually, evaluate th
 
 ---
 
+## 📐 Architecture & Workflow Diagrams
+
+### 1. Authenticated Server-Signed Upload Flow
+This diagram illustrates how client image uploads are securely signed without leaking `CLOUDINARY_API_SECRET` to the browser:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Developer / Browser
+    participant API as Next.js Route (/api/sign-upload)
+    participant SDK as Cloudinary Node.js SDK
+    participant CDN as Cloudinary Upload API
+
+    User->>API: 1. POST request to initiate upload
+    Note over API,SDK: CLOUDINARY_API_SECRET stays strictly on server
+    API->>SDK: 2. Generate SHA signature with timestamp & folder
+    SDK-->>API: 3. Return signature, timestamp & apiKey
+    API-->>User: 4. JSON: { signature, timestamp, folder, apiKey }
+    User->>CDN: 5. Direct multipart upload (File + Signature)
+    CDN-->>User: 6. 200 OK: { public_id, width, height, format, bytes }
+    Note over User: App updates state & renders instant preview
+```
+
+---
+
+### 2. Transformation Pipeline & Visual Inspection
+This diagram illustrates how visual settings dynamically compile into valid Cloudinary URL segments:
+
+```mermaid
+flowchart LR
+    A[Transformation Controls] -->|Resize w, h| B(Parameter Compiler)
+    A -->|Crop Mode c_fit, c_fill| B
+    A -->|Format f_auto, WebP, AVIF| B
+    A -->|Quality q_auto, q_80| B
+    A -->|Advanced g_auto, dpr, strip| B
+    
+    B -->|Generates URL| C["res.cloudinary.com/.../upload/{params}/{public_id}"]
+    
+    C --> D[Edge CDN Delivery]
+    D --> E[Interactive Split Slider]
+    D --> F[Side-by-Side Canvas]
+    D --> G[Code Export: HTML / Next.js / Node.js]
+```
+
+---
+
+### 3. Live Client-Side Benchmarking Workflow
+This diagram illustrates how Transforma measures genuine network performance without hardcoded mock data:
+
+```mermaid
+flowchart TD
+    Start([Execute Suite Benchmark]) --> Loop[Iterate Scenarios: Original, Auto f/q, Resized, High Quality]
+    
+    Loop --> CacheBust[Attach cache-busting timestamp: ?bench_ts=...]
+    CacheBust --> Fetch[Fetch image stream from Cloudinary CDN]
+    
+    Fetch --> Perf[Measure latency via performance.now]
+    Fetch --> Size[Extract byte payload via Content-Length or Blob]
+    Fetch --> Format[Extract format from Content-Type]
+    
+    Perf --> Table[Aggregate Results Table]
+    Size --> Table
+    Format --> Table
+    
+    Table --> Calc[Compute Percentage Savings vs Baseline]
+    Calc --> Display([Render Real Latency & Data Savings])
+```
+
+---
+
 ## ✨ Features Overview
 
 ### 1. 🎛️ Interactive Transformation Playground
@@ -89,8 +159,8 @@ Instant 1-click copy for:
 ### 1. Clone the repository & install dependencies
 
 ```bash
-git clone https://github.com/your-username/transforma.git
-cd transforma
+git clone https://github.com/ab2030909/Transforma.git
+cd Transforma
 npm install
 ```
 
@@ -150,4 +220,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+## 🤝 Cloudinary Creators Community Milestone
 
+Built as a verified milestone project for the **Cloudinary Creators Community** to provide a hands-on developer sandbox demonstrating dynamic transformations, secure signature generation, and payload benchmarking.
